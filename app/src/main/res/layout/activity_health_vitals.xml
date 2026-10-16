@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F0F4FF"
+    android:orientation="vertical">
+
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/gradient_header"
+        android:paddingTop="48dp"
+        android:paddingBottom="20dp"
+        android:paddingHorizontal="8dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="@drawable/bg_icon_circle_blue"
+            android:src="@drawable/ic_arrow_back"
+            android:contentDescription="Quay lại"
+            android:padding="10dp"
+            android:alpha="0.85"/>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="12dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Chỉ số sức khoẻ"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Theo dõi các chỉ số hàng ngày"
+                android:textColor="#C7D9FF"
+                android:textSize="12sp"/>
+        </LinearLayout>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabAdd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:src="@drawable/ic_add"
+            android:contentDescription="Thêm chỉ số"
+            app:backgroundTint="#FFFFFF"
+            app:tint="#0D6EFD"
+            app:fabSize="mini"
+            app:elevation="4dp"/>
+    </LinearLayout>
+
+    <!-- Quick Stats Row -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingHorizontal="12dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="4dp">
+
+        <!-- Heart Rate Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="4dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="#FFFFFF">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="12dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="❤️" android:textSize="22sp"/>
+                <TextView android:id="@+id/txtHeartRate" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="--" android:textColor="#EF4444" android:textSize="18sp" android:textStyle="bold" android:layout_marginTop="2dp"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Nhịp tim" android:textColor="#9CA3AF" android:textSize="10sp"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="bpm" android:textColor="#9CA3AF" android:textSize="10sp"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Blood Pressure Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="4dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="#FFFFFF">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="12dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="💉" android:textSize="22sp"/>
+                <TextView android:id="@+id/txtBloodPressure" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="--/--" android:textColor="#0D6EFD" android:textSize="15sp" android:textStyle="bold" android:layout_marginTop="2dp"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Huyết áp" android:textColor="#9CA3AF" android:textSize="10sp"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="mmHg" android:textColor="#9CA3AF" android:textSize="10sp"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Weight Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="4dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="#FFFFFF">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="12dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="⚖️" android:textSize="22sp"/>
+                <TextView android:id="@+id/txtWeight" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="--" android:textColor="#10B981" android:textSize="18sp" android:textStyle="bold" android:layout_marginTop="2dp"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Cân nặng" android:textColor="#9CA3AF" android:textSize="10sp"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="kg" android:textColor="#9CA3AF" android:textSize="10sp"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Blood Glucose Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="4dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="#FFFFFF">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="12dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="🩸" android:textSize="22sp"/>
+                <TextView android:id="@+id/txtGlucose" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="--" android:textColor="#F59E0B" android:textSize="18sp" android:textStyle="bold" android:layout_marginTop="2dp"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Đường huyết" android:textColor="#9CA3AF" android:textSize="10sp"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="mg/dL" android:textColor="#9CA3AF" android:textSize="10sp"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+    </LinearLayout>
+
+    <!-- History list label -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="20dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="4dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Lịch sử đo"
+            android:textColor="#1A1A2E"
+            android:textSize="16sp"
+            android:textStyle="bold"/>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/txtEmpty"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Chưa có dữ liệu. Nhấn + để thêm chỉ số."
+        android:textColor="#9CA3AF"
+        android:textSize="14sp"
+        android:gravity="center"
+        android:padding="24dp"
+        android:visibility="gone"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingBottom="80dp"
+        android:clipToPadding="false"/>
+</LinearLayout>

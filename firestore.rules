@@ -1,0 +1,229 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function isPatient() {
+      return signedIn() && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'patient';
+    }
+    function isDoctor() {
+      return signedIn() && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'doctor';
+    }
+    function appt(id) { return get(/databases/$(database)/documents/appointments/$(id)).data; }
+    function apptAfter(id) { return getAfter(/databases/$(database)/documents/appointments/$(id)).data; }
+
+    match /users/{uid} {
+      allow get: if signedIn() && request.auth.uid == uid;
+      allow list: if false;
+      // Only a patient can self-register; doctor accounts must be provisioned in Console/Admin SDK.
+      allow create: if signedIn() && request.auth.uid == uid
+        && request.resource.data.role == 'patient'
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.keys().hasOnly([
+          'role','email','name','phone','dob','gender','address','medicalHistory','createdAt'
+        ]);
+      allow update: if signedIn() && request.auth.uid == uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'name','phone','dob','gender','address','medicalHistory'
+        ]);
+      allow delete: if false;
+    }
+
+    match /doctors/{uid} {
+      allow get, list: if signedIn();
+      // Seed doctors via Firebase Console/Admin SDK, not from the mobile client.
+      allow write: if false;
+    }
+
+    match /appointments/{appointmentId} {
+      allow get, list: if signedIn() &&
+        (resource.data.patientId == request.auth.uid || resource.data.doctorId == request.auth.uid);
+      allow create: if isPatient()
+        && request.resource.data.patientId == request.auth.uid
+        && request.resource.data.status == 'PENDING'
+        && request.resource.data.startAt > request.time
+        && request.resource.data.keys().hasAll([
+          'patientId','patientName','doctorId','doctorName','specialty','startAt',
+          'reason','slotId','status','createdAt','updatedAt'
+        ])
+        && request.resource.data.keys().hasOnly([
+          'patientId','patientName','doctorId','doctorName','specialty','startAt',
+          'reason','slotId','status','createdAt','updatedAt'
+        ])
+        && exists(/databases/$(database)/documents/doctors/$(request.resource.data.doctorId))
+        && existsAfter(/databases/$(database)/documents/slots/$(request.resource.data.slotId))
+        && getAfter(/databases/$(database)/documents/slots/$(request.resource.data.slotId)).data.appointmentId == appointmentId;
+      allow update: if signedIn()
+        && (
+          // Patient may cancel pending/confirmed booking (same atomic batch deletes slot).
+          (isPatient() && resource.data.patientId == request.auth.uid
+            && resource.data.status in ['PENDING','CONFIRMED']
+            && request.resource.data.status == 'CANCELLED'
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','updatedAt'])
+            && !existsAfter(/databases/$(database)/documents/slots/$(resource.data.slotId)))
+          ||
+          // Patient marks appointment as rated after submitting a rating
+          (isPatient() && resource.data.patientId == request.auth.uid
+            && resource.data.status == 'COMPLETED'
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['rated']))
+          ||
+          // Assigned doctor may confirm or refuse a pending booking.
+          (isDoctor() && resource.data.doctorId == request.auth.uid
+            && resource.data.status == 'PENDING'
+            && request.resource.data.status == 'CONFIRMED'
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','updatedAt']))
+          ||
+          (isDoctor() && resource.data.doctorId == request.auth.uid
+            && resource.data.status == 'PENDING'
+            && request.resource.data.status == 'CANCELLED'
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','updatedAt'])
+            && !existsAfter(/databases/$(database)/documents/slots/$(resource.data.slotId)))
+          ||
+          // Complete only when clinical record + treatment are in the same batch.
+          (isDoctor() && resource.data.doctorId == request.auth.uid
+            && resource.data.status == 'CONFIRMED'
+            && request.resource.data.status == 'COMPLETED'
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','updatedAt'])
+            && existsAfter(/databases/$(database)/documents/medical_records/$(appointmentId))
+            && existsAfter(/databases/$(database)/documents/treatment_plans/$(appointmentId)))
+        );
+      allow delete: if false;
+    }
+
+    match /slots/{slotId} {
+      // Slot holds no patient-identifying information. It is used to check availability.
+      allow get: if signedIn();
+      allow list: if false;
+      allow create: if isPatient()
+        && request.resource.data.keys().hasOnly(['appointmentId','doctorId','createdAt'])
+        && existsAfter(/databases/$(database)/documents/appointments/$(request.resource.data.appointmentId))
+        && apptAfter(request.resource.data.appointmentId).patientId == request.auth.uid
+        && apptAfter(request.resource.data.appointmentId).doctorId == request.resource.data.doctorId
+        && apptAfter(request.resource.data.appointmentId).slotId == slotId;
+      allow update: if false;
+      allow delete: if signedIn()
+        && apptAfter(resource.data.appointmentId).status == 'CANCELLED'
+        && (apptAfter(resource.data.appointmentId).patientId == request.auth.uid
+            || (isDoctor() && apptAfter(resource.data.appointmentId).doctorId == request.auth.uid));
+    }
+
+    match /medical_records/{appointmentId} {
+      // Allow the assigned users to read even when the record does not exist yet.
+      allow get: if signedIn() && exists(/databases/$(database)/documents/appointments/$(appointmentId))
+        && (appt(appointmentId).patientId == request.auth.uid || appt(appointmentId).doctorId == request.auth.uid);
+      allow list: if signedIn() &&
+        (resource.data.patientId == request.auth.uid || resource.data.doctorId == request.auth.uid);
+      allow create: if isDoctor() && request.resource.data.appointmentId == appointmentId
+        && apptAfter(appointmentId).doctorId == request.auth.uid
+        && apptAfter(appointmentId).patientId == request.resource.data.patientId
+        && apptAfter(appointmentId).status == 'COMPLETED'
+        && request.resource.data.keys().hasAll([
+          'appointmentId','patientId','doctorId','patientName','doctorName','visitAt',
+          'diagnosis','prescription','notes','createdAt','updatedAt'
+        ]);
+      allow update: if isDoctor() && resource.data.doctorId == request.auth.uid
+        && request.resource.data.appointmentId == resource.data.appointmentId
+        && request.resource.data.patientId == resource.data.patientId
+        && request.resource.data.doctorId == resource.data.doctorId
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.visitAt == resource.data.visitAt
+        && apptAfter(appointmentId).status == 'COMPLETED'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'diagnosis','prescription','notes','updatedAt'
+        ]);
+      allow delete: if false;
+    }
+
+    match /treatment_plans/{appointmentId} {
+      allow get: if signedIn() && exists(/databases/$(database)/documents/appointments/$(appointmentId))
+        && (appt(appointmentId).patientId == request.auth.uid || appt(appointmentId).doctorId == request.auth.uid);
+      allow list: if signedIn() &&
+        (resource.data.patientId == request.auth.uid || resource.data.doctorId == request.auth.uid);
+      allow create: if isDoctor()
+        && request.resource.data.appointmentId == appointmentId
+        && request.resource.data.doctorId == request.auth.uid
+        && request.resource.data.patientId == apptAfter(appointmentId).patientId
+        && apptAfter(appointmentId).doctorId == request.auth.uid
+        && apptAfter(appointmentId).status == 'COMPLETED'
+        && request.resource.data.timesPerDay is int
+        && request.resource.data.timesPerDay >= 1
+        && request.resource.data.timesPerDay <= 12;
+      allow update: if isDoctor() && resource.data.doctorId == request.auth.uid
+        && request.resource.data.doctorId == resource.data.doctorId
+        && request.resource.data.patientId == resource.data.patientId
+        && request.resource.data.appointmentId == resource.data.appointmentId
+        && request.resource.data.createdAt == resource.data.createdAt
+        && apptAfter(appointmentId).status == 'COMPLETED'
+        && request.resource.data.timesPerDay is int
+        && request.resource.data.timesPerDay >= 1
+        && request.resource.data.timesPerDay <= 12
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'medicine','method','timesPerDay','purpose','guide','updatedAt'
+        ]);
+      allow delete: if false;
+    }
+
+    // Ratings: bệnh nhân viết (1 lần/lịch khám), bác sĩ đọc đánh giá của mình
+    match /ratings/{appointmentId} {
+      allow get: if signedIn() &&
+        (resource.data.patientId == request.auth.uid || resource.data.doctorId == request.auth.uid);
+      allow list: if signedIn() &&
+        (resource.data.patientId == request.auth.uid || resource.data.doctorId == request.auth.uid);
+      allow create: if isPatient()
+        && request.resource.data.patientId == request.auth.uid
+        && request.resource.data.appointmentId == appointmentId
+        && request.resource.data.stars is int
+        && request.resource.data.stars >= 1
+        && request.resource.data.stars <= 5;
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    // Medications: bệnh nhân tự quản lý + bác sĩ có thể thêm thuốc cho bệnh nhân
+    match /medications/{uid}/list/{medId} {
+      allow read: if signedIn() && (request.auth.uid == uid ||
+        (isDoctor() && resource.data.appointmentId is string
+         && exists(/databases/$(database)/documents/appointments/$(resource.data.appointmentId))
+         && appt(resource.data.appointmentId).doctorId == request.auth.uid
+         && appt(resource.data.appointmentId).patientId == uid));
+      allow create: if signedIn() && (request.auth.uid == uid ||
+        (isDoctor() && request.resource.data.createdBy == request.auth.uid
+         && request.resource.data.appointmentId is string
+         && exists(/databases/$(database)/documents/appointments/$(request.resource.data.appointmentId))
+         && appt(request.resource.data.appointmentId).doctorId == request.auth.uid
+         && appt(request.resource.data.appointmentId).patientId == uid
+         && appt(request.resource.data.appointmentId).status in ['CONFIRMED','COMPLETED']));
+      allow update: if signedIn() && request.auth.uid == uid;
+      allow delete: if signedIn() && request.auth.uid == uid;
+    }
+
+    // Health vitals: bệnh nhân tự ghi + bác sĩ có thể ghi cho bệnh nhân
+    match /health_vitals/{uid}/records/{recordId} {
+      allow read: if signedIn() && (request.auth.uid == uid ||
+        (isDoctor() && resource.data.appointmentId is string
+         && exists(/databases/$(database)/documents/appointments/$(resource.data.appointmentId))
+         && appt(resource.data.appointmentId).doctorId == request.auth.uid
+         && appt(resource.data.appointmentId).patientId == uid));
+      allow create: if signedIn() && (request.auth.uid == uid ||
+        (isDoctor() && request.resource.data.createdBy == request.auth.uid
+         && request.resource.data.appointmentId is string
+         && exists(/databases/$(database)/documents/appointments/$(request.resource.data.appointmentId))
+         && appt(request.resource.data.appointmentId).doctorId == request.auth.uid
+         && appt(request.resource.data.appointmentId).patientId == uid
+         && appt(request.resource.data.appointmentId).status in ['CONFIRMED','COMPLETED']));
+      allow update: if signedIn() && request.auth.uid == uid;
+      allow delete: if signedIn() && request.auth.uid == uid;
+    }
+
+    // Doctor schedules: bác sĩ quản lý, bệnh nhân đọc để chọn slot
+    match /doctor_schedules/{doctorId}/slots/{slotId} {
+      allow read: if signedIn();
+      allow create: if isDoctor() && request.auth.uid == doctorId;
+      allow update: if isDoctor() && request.auth.uid == doctorId;
+      allow delete: if isDoctor() && request.auth.uid == doctorId;
+    }
+
+    match /{document=**} { allow read, write: if false; }
+  }
+}

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/gradient_header">
+
+    <!-- Decorative circles background -->
+    <View
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="-80dp"
+        android:alpha="0.07"
+        android:background="@drawable/bg_icon_circle_blue"/>
+
+    <View
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="-60dp"
+        android:layout_marginBottom="-60dp"
+        android:alpha="0.08"
+        android:background="@drawable/bg_icon_circle_blue"/>
+
+    <View
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="-30dp"
+        android:layout_marginTop="80dp"
+        android:alpha="0.07"
+        android:background="@drawable/bg_icon_circle_blue"/>
+
+    <!-- Center content -->
+    <LinearLayout
+        android:id="@+id/logoContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <!-- Logo circle with cross -->
+        <LinearLayout
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:background="@drawable/bg_splash_logo"
+            android:gravity="center"
+            android:elevation="8dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="✚"
+                android:textColor="#0D6EFD"
+                android:textSize="48sp"
+                android:textStyle="bold"/>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="UniCare"
+            android:textColor="#FFFFFF"
+            android:textSize="38sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.04"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Chăm sóc sức khoẻ thông minh"
+            android:textColor="#C7D9FF"
+            android:textSize="16sp"
+            android:letterSpacing="0.02"/>
+    </LinearLayout>
+
+    <!-- Loading indicator at bottom -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="60dp"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:indeterminate="true"
+            android:indeterminateTint="#FFFFFF"
+            style="?android:attr/progressBarStyle"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="Đang khởi động..."
+            android:textColor="#A0BFFF"
+            android:textSize="13sp"/>
+    </LinearLayout>
+
+    <!-- Version at very bottom -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="16dp"
+        android:gravity="center"
+        android:text="Phiên bản 2.0 • Học tập"
+        android:textColor="#6080C0"
+        android:textSize="11sp"/>
+</RelativeLayout>

@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F0F4FF"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/gradient_header"
+            android:paddingTop="48dp"
+            android:paddingBottom="20dp"
+            android:paddingHorizontal="8dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/btnBack"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="@drawable/bg_icon_circle_blue"
+                android:src="@drawable/ic_arrow_back"
+                android:contentDescription="Quay lại"
+                android:padding="10dp"
+                android:alpha="0.85"/>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="12dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/txtDoctorName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Thống kê"
+                    android:textColor="#FFFFFF"
+                    android:textSize="20sp"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tổng quan hoạt động khám bệnh"
+                    android:textColor="#C7D9FF"
+                    android:textSize="12sp"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Stats Cards Row 1 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingHorizontal="12dp"
+            android:paddingTop="16dp">
+
+            <!-- Today's appointments -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/statCardToday"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_margin="4dp"
+                android:foreground="?attr/selectableItemBackground"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="5dp"
+                app:cardBackgroundColor="#0D6EFD">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="📅" android:textSize="24sp"/>
+                    <TextView android:id="@+id/txtTodayCount" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textColor="#FFFFFF" android:textSize="28sp" android:textStyle="bold" android:layout_marginTop="4dp"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Hôm nay" android:textColor="#C7D9FF" android:textSize="12sp"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Pending to confirm -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/statCardPending"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_margin="4dp"
+                android:foreground="?attr/selectableItemBackground"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="5dp"
+                app:cardBackgroundColor="#F59E0B">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="⏳" android:textSize="24sp"/>
+                    <TextView android:id="@+id/txtPendingCount" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textColor="#FFFFFF" android:textSize="28sp" android:textStyle="bold" android:layout_marginTop="4dp"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Chờ duyệt" android:textColor="#FEF3C7" android:textSize="12sp"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Total completed -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/statCardCompleted"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_margin="4dp"
+                android:foreground="?attr/selectableItemBackground"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="5dp"
+                app:cardBackgroundColor="#10B981">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="✅" android:textSize="24sp"/>
+                    <TextView android:id="@+id/txtCompletedCount" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textColor="#FFFFFF" android:textSize="28sp" android:textStyle="bold" android:layout_marginTop="4dp"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Đã khám" android:textColor="#D1FAE5" android:textSize="12sp"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+        </LinearLayout>
+
+        <!-- Rating card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="8dp"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="#FFFFFF">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="18dp"
+                android:gravity="center_vertical">
+
+                <LinearLayout
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:background="@drawable/bg_icon_circle_amber"
+                    android:gravity="center">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="⭐" android:textSize="22sp"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="14dp"
+                    android:orientation="vertical">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Đánh giá trung bình" android:textColor="#1A1A2E" android:textSize="15sp" android:textStyle="bold"/>
+                    <TextView android:id="@+id/txtRating" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Chưa có đánh giá" android:textColor="#9CA3AF" android:textSize="13sp" android:layout_marginTop="2dp"/>
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/txtRatingValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="--"
+                    android:textColor="#F59E0B"
+                    android:textSize="28sp"
+                    android:textStyle="bold"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Pending Appointments - Quick Actions -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="4dp"
+            android:text="Chờ xác nhận"
+            android:textColor="#1A1A2E"
+            android:textSize="16sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/txtNoPending"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="🎉 Không có lịch nào đang chờ"
+            android:textColor="#9CA3AF"
+            android:textSize="14sp"
+            android:gravity="center"
+            android:padding="16dp"
+            android:visibility="gone"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerPending"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false"/>
+
+        <View android:layout_width="match_parent" android:layout_height="24dp"/>
+    </LinearLayout>
+</ScrollView>
